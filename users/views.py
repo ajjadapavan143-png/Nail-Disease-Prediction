@@ -279,11 +279,14 @@ def get_model_and_labels():
     global loaded_model, loaded_class_labels
 
     if loaded_model is None:
-        # Prefer .keras, fallback .h5
+        # Prefer best_model.keras (repo lo unna main model), fallback old names
+        best_model_path = os.path.join(settings.BASE_DIR, "best_model.keras")
         keras_model_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.keras")
         h5_model_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.h5")
 
-        if os.path.exists(keras_model_path):
+        if os.path.exists(best_model_path):
+            model_path = best_model_path
+        elif os.path.exists(keras_model_path):
             model_path = keras_model_path
         elif os.path.exists(h5_model_path):
             model_path = h5_model_path
@@ -493,4 +496,4 @@ def UserPredictionHistory(request):
         return render(request, 'UserLogin.html', {})
         
     history = PredictionHistory.objects.filter(loginid=loginid).order_by('-created_at')
-    return render(request, 'users/user_prediction_history.html', {'history': history})
+    return render(request, 'users/user_prediction_history.html', {'history': history})
