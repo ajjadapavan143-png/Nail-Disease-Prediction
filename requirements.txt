@@ -7,3 +7,4 @@ matplotlib
 scikit-learn
 tensorflow
 gunicorn
+whitenoise==6.7.0
