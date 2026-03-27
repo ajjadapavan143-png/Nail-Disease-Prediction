@@ -1,0 +1,41 @@
+{%extends 'users/userbase.html'%}
+{%load static%}
+{%block contents%}
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>Model Training Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+        .metrics {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .metrics span {
+            font-weight: bold;
+            color: green;
+        }
+        img {
+            border: 2px solid #555;
+            width: 100%;
+            max-width: 700px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Model Training Summary</h1>
+    
+    <div class="metrics">
+        <p>Validation Accuracy: <span>{{ val_accuracy }}%</span></p>
+        <p>Validation Loss: <span>{{ val_loss }}</span></p>
+    </div>
+
+    <h2>Training & Validation Plots</h2>
+    <img src="{{ plot_url }}" alt="Training Plot">
+</body>
+</html>
+{%endblock%}

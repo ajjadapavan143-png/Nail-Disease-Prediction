@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contents %}
+    <!-- Hero Section -->
+    <section class="hero" style="background: none; min-height: 80vh;">
+        <div class="hero-content" style="margin-top: 80px;">
+            <!-- White Glassmorphism Card -->
+            <div class="glass-card">
+                <div class="badge-dl">Deep Learning Powered</div>
+                <h1>Nail Disease Classification</h1>
+                <p class="subtitle">Advanced artificial intelligence technology to instantly analyze, detect, and classify nail abnormalities with high dermatological precision.</p>
+                <!-- Removed Upload Image and Live Camera Buttons -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Why Choose Our AI Model?</h2>
+            <p>Empowering dermatology with state-of-the-art computer vision models.</p>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h3>Real-Time Analysis</h3>
+                <p>Instantaneous prediction using our optimized deep learning models to deliver clinical-grade detection within seconds.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <h3>High Accuracy</h3>
+                <p>Trained on thousands of clinically validated nail images to ensure high precision in identifying various diseases.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h3>Privacy First</h3>
+                <p>Your medical data is processed securely through encrypted channels. Images are strictly confidential and protected.</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'users/userbase.html' %}
+{% block contents %}
+<section id="history" class="container mt-5 content-section">
+    <div class="card shadow-lg p-4" style="border-radius: 15px;">
+        <h3 class="text-center mb-4" style="color: #764ba2;">Your Prediction History</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Image</th>
+                        <th>Predicted Result</th>
+                        <th>Confidence</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td class="align-middle">{{ item.created_at|date:"M d, Y h:i A" }}</td>
+                        <td class="align-middle text-center">
+                            {% if item.prediction_image %}
+                            <a href="{{ item.prediction_image.url }}" data-lightbox="history">
+                                <img src="{{ item.prediction_image.url }}" alt="Nail Image" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                            </a>
+                            {% else %}
+                            <span class="text-muted">No Image</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle font-weight-bold {% if item.predicted_class == 'have no disease' or item.predicted_class == 'Healthy_Nail' %}text-success{% else %}text-danger{% endif %}">{{ item.predicted_class }}</td>
+                        <td class="align-middle">{% if item.confidence %}{{ item.confidence }}%{% else %}-{% endif %}</td>
+                        <td class="align-middle text-capitalize">{{ item.source }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No predictions found yet. Try analyzing an image!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

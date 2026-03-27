@@ -1,0 +1,312 @@
+{% extends 'users/userbase.html' %}
+{% load static %}
+
+{% block contents %}
+
+<style>
+    .prediction-wrapper {
+        padding: 40px 0;
+        min-height: 70vh;
+    }
+
+    .prediction-card {
+        background-color: #ffffff;
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .prediction-title {
+        text-align: center;
+        color: #2c3e50;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .prediction-form,
+    .camera-section {
+        background-color: #f8f9fa;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    .prediction-form label,
+    .camera-title {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #34495e;
+    }
+
+    .prediction-form input[type="file"] {
+        padding: 10px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+        background-color: #fff;
+        color: #000 !important;
+    }
+
+    .predict-btn, .camera-btn {
+        background-color: #3498db;
+        border: none;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .predict-btn:hover, .camera-btn:hover {
+        background-color: #2980b9;
+    }
+
+    .stop-btn {
+        background-color: #dc3545;
+    }
+
+    .stop-btn:hover {
+        background-color: #c82333;
+    }
+
+    .capture-btn {
+        background-color: #28a745;
+    }
+
+    .capture-btn:hover {
+        background-color: #218838;
+    }
+
+    .result-box {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 25px;
+        text-align: center;
+        border: 1px solid #eee;
+    }
+
+    .result-box img {
+        max-width: 100%;
+        max-height: 300px;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+    }
+
+    .result-box p {
+        font-size: 18px;
+        margin: 8px 0;
+        color: #2c3e50;
+    }
+
+    .result-heading {
+        color: #28a745;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .message-box {
+        margin-bottom: 20px;
+    }
+
+    .message-box .alert {
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    #video {
+        width: 100%;
+        max-height: 380px;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+        background: #000;
+        display: none;
+        margin-bottom: 15px;
+        object-fit: cover;
+    }
+
+    #canvas {
+        display: none;
+    }
+
+    .preview-img {
+        width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        margin-top: 15px;
+        display: none;
+    }
+
+    .or-divider {
+        text-align: center;
+        font-weight: bold;
+        margin: 20px 0;
+        color: #666;
+        font-size: 18px;
+    }
+
+    .camera-note {
+        margin-top: 12px;
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+    }
+</style>
+
+<div class="container prediction-wrapper">
+    <div class="prediction-card">
+
+        <h1 class="prediction-title">Nail Disease Prediction</h1>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="message-box">
+                {% for message in messages %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Upload Form -->
+        <form method="post" enctype="multipart/form-data" class="prediction-form">
+            {% csrf_token %}
+            <label for="nail_image">Upload Nail Image:</label>
+            <input type="file" name="nail_image" accept="image/*" />
+            <button type="submit" class="predict-btn">Predict from Upload</button>
+        </form>
+
+        <div class="or-divider">OR</div>
+
+        <!-- Camera Form -->
+        <div class="camera-section">
+            <div class="camera-title">Use Live Camera</div>
+
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <img id="previewImage" class="preview-img" alt="Captured Image Preview" />
+
+            <button type="button" class="camera-btn" onclick="startCamera()">Open Camera</button>
+            <button type="button" class="camera-btn capture-btn" onclick="captureImage()">Capture Nail Image</button>
+            <button type="button" class="camera-btn stop-btn" onclick="stopCamera()">Stop Camera</button>
+
+            <form method="post" id="cameraForm" style="margin-top: 15px;" onsubmit="return validateCameraPrediction();">
+                {% csrf_token %}
+                <input type="hidden" name="captured_image" id="captured_image">
+                <button type="submit" class="predict-btn">Predict from Camera</button>
+            </form>
+
+            <div class="camera-note">
+                <strong>Tip:</strong> Show only the nail clearly and closely. Avoid face, hand, or background in the frame.
+            </div>
+        </div>
+
+        <!-- Result -->
+        {% if predicted_class %}
+        <div class="result-box">
+            <h2 class="result-heading">Prediction Result</h2>
+
+            {% if image_data %}
+                <img src="data:image/jpeg;base64,{{ image_data }}" alt="Predicted Image" />
+            {% endif %}
+
+            <p><strong>Predicted Class:</strong> {{ predicted_class }}</p>
+            {% if confidence %}
+            <p><strong>Confidence:</strong> {{ confidence }}%</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let capturedInput = document.getElementById('captured_image');
+    let previewImage = document.getElementById('previewImage');
+    let stream = null;
+
+    async function startCamera() {
+        try {
+            if (stream) {
+                stopCamera();
+            }
+
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment"
+                },
+                audio: false
+            });
+
+            video.srcObject = stream;
+            video.style.display = 'block';
+            previewImage.style.display = 'none';
+
+        } catch (err) {
+            alert("Camera access denied or camera not available.");
+            console.error("Camera Error:", err);
+        }
+    }
+
+    function captureImage() {
+        if (!stream || !video.videoWidth || !video.videoHeight) {
+            alert("Please open camera first and wait 1-2 seconds.");
+            return;
+        }
+
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageDataURL = canvas.toDataURL('image/jpeg', 0.9);
+        capturedInput.value = imageDataURL;
+
+        previewImage.src = imageDataURL;
+        previewImage.style.display = 'block';
+
+        alert("Image captured successfully! Now click 'Predict from Camera'.");
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+            stream = null;
+            video.style.display = 'none';
+        }
+    }
+
+    function validateCameraPrediction() {
+        if (!capturedInput.value || capturedInput.value.trim() === "") {
+            alert("Please capture nail image first, then click Predict from Camera.");
+            return false;
+        }
+        return true;
+    }
+
+    // Auto stop camera when page refresh/close
+    window.addEventListener('beforeunload', function () {
+        stopCamera();
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nail Disease Classification</title>
+    <!-- Bring in Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/homestyle.css' %}">
+    
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .page-wrapper {
+            position: relative;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=2080&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.85) 100%);
+            z-index: 1;
+            position: fixed;
+        }
+        .content-z { z-index: 2; position: relative; flex-grow: 1; }
+        
+        .navbar { padding: 1.25rem 5% !important; }
+        
+        /* General input overrides for inner dashboard pages */
+        .form-control, .form-control[readonly] { 
+            background: rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: #fff; 
+        }
+        .form-control:focus { 
+            background: rgba(255, 255, 255, 0.15); 
+            border-color: var(--primary-teal); color: #fff; 
+            box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.25); 
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+        /* Dashboard specific */
+        .page-header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            color: #fff;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .page-header h2 {
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(to right, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Table overrides for dashboard */
+        table { color: white !important; }
+        .table { color: white !important; background: transparent; }
+        .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.05); }
+        .table-hover tbody tr:hover { background-color: rgba(255,255,255,0.1); }
+        .table thead th { border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .table td, .table th { border-top: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Card overrides for dashboard */
+        .card { 
+            background: rgba(30, 41, 59, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+        .card-header, .card-footer { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); }
+        
+        /* Typography overrides */
+        h1, h2, h3, h4, h5, h6, label { color: white; }
+        .text-dark { color: white !important; }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="page-overlay"></div>
+        
+        <!-- Dark Transparent Navbar -->
+        <nav class="navbar content-z">
+            <div class="logo">
+                <i class="fa-solid fa-microscope"></i>
+                <span class="ml-2">NailCare AI</span>
+            </div>
+            <div class="d-flex align-items-center flex-wrap" style="gap: 1rem;">
+                <a href="{% url 'AdminHome' %}" class="btn-outline d-none d-md-inline-block">Home</a>
+                <a href="{% url 'RegisterUsersView' %}" class="btn-outline d-none d-md-inline-block">User Details</a>
+                <a href="{% url 'index' %}" class="btn-outline">Logout</a>
+            </div>
+        </nav>
+
+        <div class="content-z">
+            <div class="page-header">
+                <div class="container">
+                    <h2>Admin Dashboard</h2>
+                </div>
+            </div>
+            
+            {% block contents %}
+            {% endblock %}
+        </div>
+        
+
+    </div>
+</body>
+</html>

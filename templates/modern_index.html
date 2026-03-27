@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nail Disease Classification</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Modern CSS -->
+    <link rel="stylesheet" href="{% static 'assets/css/modern_style.css' %}">
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="navbar">
+        <a href="{% url 'index' %}" class="logo-container">
+            <i class="fa-solid fa-hand-holding-medical"></i>
+            <span class="logo-title">Nail Disease Classification</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="{% url 'index' %}">Home</a></li>
+            <li><a href="{% url 'UserLogin' %}">User</a></li>
+            <li><a href="{% url 'AdminLogin' %}">Admin</a></li>
+            <li><a href="{% url 'UserRegisterForm' %}">Register</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-card">
+            <h1 class="hero-title">Nail Disease Classification Using Deep Learning</h1>
+            <p class="hero-subtitle">
+                Detect nail diseases from uploaded or live camera images using an AI-powered classification system. 
+                Experience fast, reliable, and intelligent medical screening.
+            </p>
+            <div class="hero-buttons">
+                <!-- Links lead to their respective routes according to user choices -->
+                <a href="{% url 'UserLogin' %}" class="btn btn-primary">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Image
+                </a>
+                <a href="{% url 'UserLogin' %}" class="btn btn-secondary">
+                    <i class="fa-solid fa-camera"></i> Live Camera
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards Section -->
+    <section class="features">
+        <div class="features-container">
+            <!-- Feature Card 1 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fa-regular fa-image"></i>
+                </div>
+                <h3 class="feature-title">Upload Nail Image</h3>
+                <p class="feature-desc">
+                    Easily upload photos of affected nails from your device. Our advanced deep learning model analyzes them securely and accurately.
+                </p>
+            </div>
+
+            <!-- Feature Card 2 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <h3 class="feature-title">Live Camera Detection</h3>
+                <p class="feature-desc">
+                    Use your device's camera for real-time nail disease screening. Instant processing for faster clinical feedback and awareness.
+                </p>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+                <h3 class="feature-title">AI Prediction Result</h3>
+                <p class="feature-desc">
+                    Receive detailed diagnostic predictions complete with confidence scores and disease identification, excluding unrelated images automatically.
+                </p>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

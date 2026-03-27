@@ -1,0 +1,7 @@
+best_model.keras
+Nail_disease_model_1.h5
+db.sqlite3
+__pycache__/
+*.pyc
+media/
+staticfiles/
