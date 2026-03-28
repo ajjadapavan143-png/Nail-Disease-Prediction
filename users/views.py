@@ -15,9 +15,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-
 from .forms import UserRegistrationForm
 from .models import UserRegistrationModel, PredictionHistory
 
@@ -98,7 +95,6 @@ def training(request):
     train_path = os.path.join(settings.MEDIA_ROOT, 'data', 'train')
     validation_path = os.path.join(settings.MEDIA_ROOT, 'data', 'validation')
 
-    # Check dataset folders exist
     if not os.path.exists(train_path):
         messages.error(request, f"Train folder not found: {train_path}")
         return render(request, 'users/training.html', {})
@@ -139,7 +135,6 @@ def training(request):
                         print("Skipped bad image:", img_path, str(e))
                         continue
 
-    # Optional preprocessing
     preprocess_and_save_images(train_path, train_path)
     preprocess_and_save_images(validation_path, validation_path)
 
@@ -168,7 +163,6 @@ def training(request):
 
     print("Class Indices =", train_dataset.class_indices)
 
-    # Save class labels
     sorted_class_labels = list(train_dataset.class_indices.keys())
     labels_path = os.path.join(settings.BASE_DIR, 'class_labels.json')
 
@@ -217,7 +211,6 @@ def training(request):
 
     val_loss, val_accuracy = model.evaluate(val_dataset, verbose=0)
 
-    # Save in .keras format (recommended)
     model_save_path = os.path.join(settings.BASE_DIR, 'Nail_disease_model_1.keras')
     model.save(model_save_path)
     print("Model saved at:", model_save_path)
@@ -254,7 +247,6 @@ def training(request):
 
     plot_history(history)
 
-    # Reset loaded model after retraining
     global loaded_model, loaded_class_labels
     loaded_model = None
     loaded_class_labels = None
@@ -278,8 +270,10 @@ loaded_class_labels = None
 def get_model_and_labels():
     global loaded_model, loaded_class_labels
 
+    # IMPORTANT: tensorflow import ONLY here
+    from tensorflow.keras.models import load_model
+
     if loaded_model is None:
-        # Prefer best_model.keras (repo lo unna main model), fallback old names
         best_model_path = os.path.join(settings.BASE_DIR, "best_model.keras")
         keras_model_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.keras")
         h5_model_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.h5")
@@ -299,7 +293,6 @@ def get_model_and_labels():
             loaded_model = load_model(model_path, compile=False)
             print("Model loaded successfully")
 
-            # Warm-up for faster first real prediction
             dummy = np.zeros((1, 128, 128, 3), dtype=np.float32)
             loaded_model.predict(dummy, verbose=0)
             print("Model warm-up completed")
@@ -325,6 +318,9 @@ def get_model_and_labels():
 # IMAGE PREPROCESS
 # =========================
 def load_and_preprocess_image(img):
+    # IMPORTANT: keras image import ONLY here
+    from tensorflow.keras.preprocessing import image
+
     img = img.resize((128, 128), Image.Resampling.LANCZOS)
     img_array = image.img_to_array(img)
     img_array = img_array / 255.0
@@ -385,27 +381,23 @@ def process_prediction_image(img, request, source_type='upload'):
 
         print("Predicted Class =", predicted_class)
         print("Confidence =", confidence)
+
         if source_type == 'camera':
-            # Live camera captures have background which lowers confidence, or causes "Not_Nail" prediction.
-            # Reject only if it's very confidently Not_Nail.
             if predicted_class == "Not_Nail" and confidence > 85:
                 messages.error(request, "Invalid Image. Please capture a clear nail image only.")
                 return None, True
-            
-            # Since the user wants a normal nail capture to be "have no disease",
-            # we simply assign it as long as it wasn't rejected.
+
             predicted_class = "have no disease"
             confidence_str = ""
         else:
             if predicted_class == "Not_Nail" or confidence < 45:
                 messages.error(request, "Invalid Nail Image. Please upload a clear nail image only.")
                 return None, True
-                
+
             if predicted_class == "Healthy_Nail":
                 predicted_class = "have no disease"
             confidence_str = f"{confidence:.2f}"
 
-        # SAVE HISTORY
         save_prediction_history(request, img, predicted_class, confidence_str, source_type)
 
         buffered = io.BytesIO()
@@ -426,7 +418,6 @@ def process_prediction_image(img, request, source_type='upload'):
         return None, True
 
 
-
 # =========================
 # NAIL PREDICTION (UPLOAD + CAMERA)
 # =========================
@@ -434,8 +425,6 @@ def nail_prediction_view(request):
     context = {}
 
     if request.method == 'POST':
-
-        # CAMERA IMAGE HANDLE
         captured_image = request.POST.get('captured_image')
 
         if captured_image:
@@ -459,7 +448,6 @@ def nail_prediction_view(request):
                 messages.error(request, "Captured image is invalid. Please try again.")
                 return render(request, 'users/nail_prediction.html', context)
 
-        # FILE UPLOAD HANDLE
         uploaded_file = request.FILES.get('nail_image')
 
         if not uploaded_file:
@@ -494,6 +482,6 @@ def UserPredictionHistory(request):
     loginid = request.session.get('loginid')
     if not loginid:
         return render(request, 'UserLogin.html', {})
-        
+
     history = PredictionHistory.objects.filter(loginid=loginid).order_by('-created_at')
     return render(request, 'users/user_prediction_history.html', {'history': history})
