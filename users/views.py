@@ -285,34 +285,18 @@ def get_model_and_labels():
             # IMPORTANT: tensorflow import ONLY here
             os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
             import tensorflow as tf
-            try:
-                tf.config.threading.set_inter_op_parallelism_threads(1)
-                tf.config.threading.set_intra_op_parallelism_threads(1)
-            except Exception:
-                pass
 
-            from tensorflow.keras.models import load_model
+            # We use TFLite model to save massive amounts of RAM on production
+            tflite_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.tflite")
 
-            best_model_path = os.path.join(settings.BASE_DIR, "best_model.keras")
-            keras_model_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.keras")
-            h5_model_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.h5")
+            print("Trying to load TFLite model from:", tflite_path)
 
-            if os.path.exists(best_model_path):
-                model_path = best_model_path
-            elif os.path.exists(keras_model_path):
-                model_path = keras_model_path
-            elif os.path.exists(h5_model_path):
-                model_path = h5_model_path
+            if os.path.exists(tflite_path):
+                loaded_model = tf.lite.Interpreter(model_path=tflite_path)
+                loaded_model.allocate_tensors()
+                print("TFLite Model loaded successfully")
             else:
-                model_path = None
-
-            print("Trying to load model from:", model_path)
-
-            if model_path and os.path.exists(model_path):
-                loaded_model = load_model(model_path, compile=False)
-                print("Model loaded successfully")
-            else:
-                print("Model file NOT FOUND")
+                print("TFLite Model file NOT FOUND")
                 loaded_model = None
 
         if loaded_class_labels is None:
@@ -402,7 +386,17 @@ def process_prediction_image(img, request, source_type='upload'):
             messages.error(request, "Image preprocessing failed.")
             return None, True
 
-        prediction = model.predict(img_array, verbose=0)
+        if hasattr(model, 'invoke'):
+            input_details = model.get_input_details()
+            output_details = model.get_output_details()
+            
+            img_array = img_array.astype(np.float32)
+            model.set_tensor(input_details[0]['index'], img_array)
+            model.invoke()
+            prediction = model.get_tensor(output_details[0]['index'])
+        else:
+            prediction = model.predict(img_array, verbose=0)
+            
         predicted_index = np.argmax(prediction)
         predicted_class = class_labels[predicted_index]
         confidence = float(np.max(prediction) * 100)
