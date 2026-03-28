@@ -5,7 +5,6 @@ numpy
 seaborn
 matplotlib
 scikit-learn
-tflite-runtime; platform_system == 'Linux'
-tensorflow-cpu; platform_system != 'Linux'
+tensorflow-cpu
 gunicorn
 whitenoise==6.7.0
