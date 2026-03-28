@@ -271,6 +271,13 @@ def get_model_and_labels():
     global loaded_model, loaded_class_labels
 
     # IMPORTANT: tensorflow import ONLY here
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    import tensorflow as tf
+    try:
+        tf.config.threading.set_inter_op_parallelism_threads(1)
+        tf.config.threading.set_intra_op_parallelism_threads(1)
+    except Exception:
+        pass
     from tensorflow.keras.models import load_model
 
     if loaded_model is None:
@@ -387,8 +394,12 @@ def process_prediction_image(img, request, source_type='upload'):
                 messages.error(request, "Invalid Image. Please capture a clear nail image only.")
                 return None, True
 
-            predicted_class = "have no disease"
-            confidence_str = ""
+            if predicted_class == "Healthy_Nail":
+                predicted_class = "have no disease"
+            
+            confidence_str = f"{confidence:.2f}"
+            if predicted_class == "have no disease":
+                confidence_str = ""
         else:
             if predicted_class == "Not_Nail" or confidence < 45:
                 messages.error(request, "Invalid Nail Image. Please upload a clear nail image only.")
