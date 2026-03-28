@@ -282,24 +282,15 @@ def get_model_and_labels():
 
     try:
         if loaded_model is None:
-            tflite_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.tflite")
-            print("Trying to load TFLite model from:", tflite_path)
+            onnx_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.onnx")
+            print("Trying to load ONNX model from:", onnx_path)
 
-            if os.path.exists(tflite_path):
-                try:
-                    import tflite_runtime.interpreter as tflite
-                    loaded_model = tflite.Interpreter(model_path=tflite_path)
-                    print("loaded tflite_runtime interpreter")
-                except ImportError:
-                    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-                    import tensorflow as tf
-                    loaded_model = tf.lite.Interpreter(model_path=tflite_path)
-                    print("loaded tensorflow tf.lite interpreter")
-                    
-                loaded_model.allocate_tensors()
-                print("TFLite Model loaded successfully")
+            if os.path.exists(onnx_path):
+                import onnxruntime as ort
+                loaded_model = ort.InferenceSession(onnx_path)
+                print("ONNX Model loaded successfully")
             else:
-                print("TFLite Model file NOT FOUND")
+                print("ONNX Model file NOT FOUND")
                 loaded_model = None
 
         if loaded_class_labels is None:
@@ -387,7 +378,11 @@ def process_prediction_image(img, request, source_type='upload'):
             messages.error(request, "Image preprocessing failed.")
             return None, True
 
-        if hasattr(model, 'invoke'):
+        if hasattr(model, 'run'): # ONNX inference
+            input_name = model.get_inputs()[0].name
+            img_array = img_array.astype(np.float32)
+            prediction = model.run(None, {input_name: img_array})[0]
+        elif hasattr(model, 'invoke'):
             input_details = model.get_input_details()
             output_details = model.get_output_details()
             
