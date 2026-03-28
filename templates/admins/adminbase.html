@@ -61,6 +61,7 @@
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
             padding: 2rem 0;
+            margin-top: 80px;
             margin-bottom: 2rem;
             color: #fff;
             text-align: center;
@@ -94,6 +95,28 @@
         /* Typography overrides */
         h1, h2, h3, h4, h5, h6, label { color: white; }
         .text-dark { color: white !important; }
+
+        /* Force Mobile Navbar Wrapping inline */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column !important;
+                padding: 1rem !important;
+                gap: 0.5rem !important;
+            }
+            .navbar .d-flex {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 5px !important;
+            }
+            .btn-outline {
+                font-size: 0.85rem !important;
+                padding: 0.4rem 0.8rem !important;
+                margin: 2px !important;
+            }
+            .page-header {
+                margin-top: 130px;
+            }
+        }
     </style>
 </head>
 <body>

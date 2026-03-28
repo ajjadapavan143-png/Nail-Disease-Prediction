@@ -76,6 +76,28 @@
         }
         .glass-form-card table { margin: auto; }
         .glass-form-card table td { padding: 10px; color: white; text-align: left; vertical-align: middle; }
+        
+        /* Force Mobile Navbar Wrapping inline */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column !important;
+                padding: 1rem !important;
+                gap: 0.5rem !important;
+            }
+            .navbar .d-flex {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 5px !important;
+            }
+            .btn-outline {
+                font-size: 0.85rem !important;
+                padding: 0.4rem 0.8rem !important;
+                margin: 2px !important;
+            }
+            .glass-form-card {
+                margin-top: 150px;
+            }
+        }
     </style>
 </head>
 <body>
