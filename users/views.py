@@ -282,17 +282,20 @@ def get_model_and_labels():
 
     try:
         if loaded_model is None:
-            # IMPORTANT: tensorflow import ONLY here
-            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-            import tensorflow as tf
-
-            # We use TFLite model to save massive amounts of RAM on production
             tflite_path = os.path.join(settings.BASE_DIR, "Nail_disease_model_1.tflite")
-
             print("Trying to load TFLite model from:", tflite_path)
 
             if os.path.exists(tflite_path):
-                loaded_model = tf.lite.Interpreter(model_path=tflite_path)
+                try:
+                    import tflite_runtime.interpreter as tflite
+                    loaded_model = tflite.Interpreter(model_path=tflite_path)
+                    print("loaded tflite_runtime interpreter")
+                except ImportError:
+                    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+                    import tensorflow as tf
+                    loaded_model = tf.lite.Interpreter(model_path=tflite_path)
+                    print("loaded tensorflow tf.lite interpreter")
+                    
                 loaded_model.allocate_tensors()
                 print("TFLite Model loaded successfully")
             else:
@@ -323,11 +326,9 @@ def get_model_and_labels():
 # =========================
 def load_and_preprocess_image(img):
     try:
-        # IMPORTANT: keras image import ONLY here
-        from tensorflow.keras.preprocessing import image
-
         img = img.resize((128, 128), Image.Resampling.LANCZOS)
-        img_array = image.img_to_array(img)
+        # Replaced tensorflow.keras import with pure numpy to avoid immense RAM consumption
+        img_array = np.array(img, dtype=np.float32)
         img_array = img_array / 255.0
         img_array = np.expand_dims(img_array, axis=0)
         return img_array
