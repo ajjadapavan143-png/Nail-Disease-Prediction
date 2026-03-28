@@ -404,6 +404,19 @@ footer {
 @media (max-width: 768px) {
     .navbar {
         padding: 1rem 5%;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .navbar .d-flex {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 5px !important;
+    }
+    
+    .btn-outline {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
     }
     
     .nav-links, .nav-actions {

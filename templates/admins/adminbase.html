@@ -9,6 +9,12 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/homestyle.css' %}">
     
+    <!-- PWA Setup -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#14b8a6">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,9 +106,9 @@
                 <i class="fa-solid fa-microscope"></i>
                 <span class="ml-2">NailCare AI</span>
             </div>
-            <div class="d-flex align-items-center flex-wrap" style="gap: 1rem;">
-                <a href="{% url 'AdminHome' %}" class="btn-outline d-none d-md-inline-block">Home</a>
-                <a href="{% url 'RegisterUsersView' %}" class="btn-outline d-none d-md-inline-block">User Details</a>
+            <div class="d-flex align-items-center flex-wrap" style="gap: 0.5rem; justify-content: center;">
+                <a href="{% url 'AdminHome' %}" class="btn-outline">Home</a>
+                <a href="{% url 'RegisterUsersView' %}" class="btn-outline">User Details</a>
                 <a href="{% url 'index' %}" class="btn-outline">Logout</a>
             </div>
         </nav>
@@ -120,5 +126,17 @@
         
 
     </div>
+    
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register("{% static 'service-worker.js' %}").then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
 </body>
 </html>
